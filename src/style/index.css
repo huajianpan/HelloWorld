@@ -1,0 +1,12 @@
+.page-nav-bar {
+    background-color: #3296fa;
+}
+.page-nav-bar .van-nav-bar__title {
+    color: #fff;
+}
+.page-nav-bar .van-icon {
+    color: #fff;
+}
+.van-grid-item .van-grid-item__icon {
+    color: #ee0a24;
+}
