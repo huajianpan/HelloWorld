@@ -1,0 +1,75 @@
+name: 打包应用上阿里云
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+    # runs-on 指定job任务运行所需要的虚拟机环境
+    runs-on: ubuntu-latest
+    steps:
+      # 获取源码
+      - name: 迁出代码
+        # 使用action库 actions/chenckout 获取源码
+        uses: actions/checkout@v2
+        with:
+          ref: master
+
+      # 安装Node 10
+      - name: 安装node.js
+        # 使用action库 actions/setup-node 安装node
+        uses: actions/setup-node@v1
+        with: 
+          node-version: 14.15.0
+
+      # 安装依赖
+      - name: 安装依赖
+        run: yarn
+        # run: npm install  多条run
+
+      # 打包程序
+      - name: 打包程序
+        run: yarn build
+
+      # 上传阿里云
+      - name: 发布到阿里云
+        uses: easingthemes/ssh-deploy@v2.1.1
+        env:
+          #私钥 对应github项目的设置中->secrets->创建一个名为PRIVATE_KEY的私钥内容为云服务器的~/.ssh/id_rsa文件的值
+          # ~/.ssh/id_rsa
+          # cd .ssh/
+          # cat id_rsa
+          SSH_PRIVATE_KEY: ${{ secrets.PRIVATE_KEY }}
+          # scp 参数
+          ARGS: "-rltgoDzvO --delete"
+          # 源目录
+          SOURCE: "dist/"
+          # 服务器IP：换成你的服务器IP
+          # root@114.215.26.213: Permission denied (publickey,gssapi-keyex,gssapi-with-mic,password).
+          # 问题1：我是用root登陆的，显示不行，那是因为我关闭了root的登陆权限，如果你要使用root登陆可以执行 vi /etc/ssh/sshd_config
+          # 修改为PubkeyAuthentication yes（如果前面有#，就去掉#）
+          # Permission denied (publickey,gssapi-keyex,gssapi-with-mic,password). =》 PubkeyAuthentication yes（如果前面有#，就去掉#）
+          # Permanently added (RSA) to the list of known hosts的警告 vi /etc/ssh/ssh_config ==》 找到#StrictHostKeyChecking ask去掉注释，并把ask改为no即可
+          # service sshd restart重启sshd服务后再次连接就行了
+          REMOTE_HOST: "114.215.26.213"
+
+          # 用户
+          REMOTE_USER: "root"
+          # 部署到目标地址
+          TARGET: "/root/site"
+
+
+    # steps:
+    #   - uses: actions/checkout@v2
+    #   - run: yarn
+    #   - run: yarn build
+
+    #   - name: Deploy
+    #     uses: peaceiris/actions-gh-pages@v3.7.3
+    #     with:
+    #       personal_token: ${{ secrets.PERSONAL_TOKEN }}
+    #       publish_dir: ./dist
+    #       publish_branch: gh-pages
+
