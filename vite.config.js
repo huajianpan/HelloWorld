@@ -6,6 +6,8 @@ const localEnabled = process.env.USE_MOCK || false;
 const prodEnabled = process.env.USE_CHUNK_MOCK || false;
 
 export default defineConfig({
+    base: '/HelloWorld/', // https://huajianpan.github.io/HelloWorld/ 通常需要加下仓库名作为资源访问路径前缀
+    // publicDir: './public',  // 拷贝对应资源到dist下
     plugins: [
         vue(), 
         viteMockServe({

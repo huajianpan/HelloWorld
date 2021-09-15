@@ -10,10 +10,17 @@ jobs:
     - name: Checkout
       uses: actions/checkout@master
 
-    - name: Build and Deploy
-      uses: JamesIves/github-pages-deploy-action@master
-      env:
-        ACCESS_TOKEN: ${{ secrets.PRIVATE_KEY }}
-        BRANCH: gh-pages
-        FOLDER: dist
-        BUILD_SCRIPT: yarn build
+    - name: Install && Build
+      run: |
+        yarn
+        export VITE_APP_URL=/HelloWorld
+        yarn build:mock
+
+    - name: Deploy
+      uses: JamesIves/github-pages-deploy-action@4.1.5
+      with:
+        # token: ${{ secrets.PRIVATE_KEY }}
+        branch: gh-pages # 部署到的分支
+        folder: dist
+        # BUILD_SCRIPT: export VUE_APP_ENV_TEST="${{ secrets.ENV_TEST }}" && npm install && npm run build # 执行的命令
+        # .vue中直接使用例如 mounted () { this.ENV_TEST = process.env.VUE_APP_ENV_TEST }
